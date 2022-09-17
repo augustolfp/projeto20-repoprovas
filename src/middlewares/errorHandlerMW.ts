@@ -12,5 +12,5 @@ export default function errorHandlerMW(err: Error | any, req: Request, res: Resp
         return res.status(errorTypeToStatusCode(err.type)).send(err.message);
     }
 
-    return res.sendStatus(500);
+    return res.status(500).send(err);
 }
