@@ -8,3 +8,8 @@ export async function uploadTest(req: Request, res: Response) {
     const uploadToDB = await testServices.uploadNewTest(testData);
     return res.status(201).send(uploadToDB);
 }
+
+export async function getTests(req: Request, res: Response) {
+    const tests = await testServices.getTests();
+    return res.status(200).send(tests);
+}
