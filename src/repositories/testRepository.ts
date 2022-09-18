@@ -18,13 +18,15 @@ export async function getAllTests() {
     const tests = await prisma.$queryRaw`
         SELECT
             ter.number AS "termNumber",
-            tst.id AS "testId",
-            tst.name AS "testName",
+            dis.name AS "disciplineName",
+            tea.name AS "teacherName",
             cat.name AS "categoryName",
-            dis.name AS "disciplineName"
+            tst.id AS "testId",
+            tst.name AS "testName"
         FROM tests tst
             JOIN "categories" cat ON cat.id = tst."categoryId"
             JOIN "teachersDisciplines" ON "teachersDisciplines".id = tst."teacherDisciplineId"
+            JOIN "teachers" tea ON tea.id = "teachersDisciplines"."teacherId" 
             JOIN "disciplines" dis ON dis.id = "teachersDisciplines"."disciplineId"
             JOIN "terms" ter ON ter.id = dis."termId"
         `
