@@ -6,14 +6,6 @@ export async function insertNewTest(testData: ITestData) {
     return await prisma.tests.create({data: testData});
 }
 
-export async function getTestsByCategory() {
-    return await prisma.categories.findMany({
-        include: {
-            tests: true 
-        }
-    });
-}
-
 export async function getAllTests() {
 
     const tests = await prisma.$queryRaw`
