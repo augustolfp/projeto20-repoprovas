@@ -8,5 +8,6 @@ const testRouter = Router();
 
 testRouter.post('/upload-test', tokenValidationMW, validateSchemaMW(newTestSchema), testController.uploadTest);
 testRouter.get('/get-tests', tokenValidationMW, testController.getTests);
+testRouter.get('/get-test/:id',tokenValidationMW, testController.getTestById);
 
 export default testRouter;

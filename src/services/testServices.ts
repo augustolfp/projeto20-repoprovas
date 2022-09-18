@@ -9,3 +9,7 @@ export async function getTests() {
     const tests = await testRepo.getAllTests();
     return tests;
 }
+
+export async function getTestById(testId: number) {
+    return await testRepo.getTestById(testId);
+}
