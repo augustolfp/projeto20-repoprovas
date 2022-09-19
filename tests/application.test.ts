@@ -112,9 +112,19 @@ describe('Tests POST /upload-test', () => {
 
 describe('Tests GET /get-tests', () => {
 
-    it.todo('Should return an error if Authorization header is missing/incorrect/expired');
+    it('Should return an error if Authorization header is missing/incorrect/expired', async () => {
+        const token = await tokenFactory();
+        const result = await supertest(app).get('/get-tests').set('Authorization', token + 'a');
 
-    it.todo('should return a success status code and an array of tests');
+        expect(result.status).toBe(401);
+    });
+
+    it('should return a success status code and an array of tests', async () => {
+        const token = await tokenFactory();
+        const result = await supertest(app).get('/get-tests').set('Authorization', token);
+
+        expect(result.status).toBe(200);
+    });
 
 });
 
