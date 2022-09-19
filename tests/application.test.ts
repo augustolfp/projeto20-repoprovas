@@ -39,13 +39,48 @@ describe('Tests POST /sign-up', () => {
 
 describe('Tests POST /sign-in', () => {
 
-    it.todo('Should return an error if user format is invalid');
+    it('Should return an error if user format is invalid', async () => {
+        const user = await userFactory();
+        await supertest(app).post('/sign-up').send(user);
 
-    it.todo('Should return an error if user password is incorrect');
+        const bodyNoPassword: {email: string, password?: string} = {...user};
+        delete bodyNoPassword.password;
 
-    it.todo('Should return an error if user doesnt exist on database');
+        const bodyNoEmail: {email?: string, password: string} = {...user};
+        delete bodyNoEmail.email;
 
-    it.todo('Should return a success status code and return a JWT token if user credentials are correct');
+        const noPasswordSignIn = await supertest(app).post('/sign-in').send(bodyNoPassword);
+        const noEmailSignIn = await supertest(app).post('/sign-in').send(bodyNoEmail);
+
+        expect(noPasswordSignIn.status).toBe(400);
+        expect(noEmailSignIn.status).toBe(400);
+    });
+
+    it('Should return an error if user password is incorrect', async () => {
+        const user = await userFactory();
+        await supertest(app).post('/sign-up').send(user);
+
+        const result = await supertest(app).post('/sign-in').send({...user, password: "1234"});
+
+        expect(result.status).toBe(401);
+    });
+
+    it('Should return an error if user doesnt exist on database', async () => {
+        const user = await userFactory();
+
+        const result = await supertest(app).post('/sign-in').send(user);
+
+        expect(result.status).toBe(401);
+    });
+
+    it('Should return a success status code and return a JWT token if user credentials are correct', async () => {
+        const user = await userFactory();
+        await supertest(app).post('/sign-up').send(user);
+
+        const result = await supertest(app).post('/sign-in').send(user);
+
+        expect(result.status).toBe(201);
+    });
 });
 
 describe('Tests POST /upload-test', () => {
