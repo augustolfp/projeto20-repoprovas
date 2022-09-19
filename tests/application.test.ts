@@ -1,6 +1,7 @@
 import supertest from "supertest";
 import {prisma} from '../src/config/database';
 import app from '../src/app';
+import userFactory from './factories/userFactory';
 
 afterAll(async () => {
     await prisma.$disconnect();
@@ -10,18 +11,30 @@ afterAll(async () => {
 describe('Tests POST /sign-up', () => {
 
     it('Should return an error if submitted user format is invalid', async () => {
-        const body = {
-            email: "augusto@gmail.com"
-        };
+
+        const user = await userFactory();
+        const body: {email: string, password?: string} = {...user};
+        delete body.password;
 
         const result = await supertest(app).post('/sign-up').send(body);
 
         expect(result.status).toBe(400);
     });
 
-    it.todo('Should return an error if user already exists');
+    it('Should return an error if user already exists', async () => {
+        const user = await userFactory();
+        const firstInsert = await supertest(app).post('/sign-up').send(user);
+        const secondInsert = await supertest(app).post('/sign-up').send(user);
 
-    it.todo('should return a sucess status code if input user format is correct');
+        expect(secondInsert.status).toBe(403);
+    });
+
+    it('should return a sucess status code if input user format is correct', async () => {
+        const user = await userFactory();
+        const result = await supertest(app).post('/sign-up').send(user);
+
+        expect(result.status).toBe(201);
+    });
 });
 
 describe('Tests POST /sign-in', () => {
