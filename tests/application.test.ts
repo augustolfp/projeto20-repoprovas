@@ -2,6 +2,8 @@ import supertest from "supertest";
 import {prisma} from '../src/config/database';
 import app from '../src/app';
 import userFactory from './factories/userFactory';
+import testFactory from './factories/testFactory';
+import tokenFactory from './factories/tokenFactory';
 
 afterAll(async () => {
     await prisma.$disconnect();
@@ -76,7 +78,6 @@ describe('Tests POST /sign-in', () => {
     it('Should return a success status code and return a JWT token if user credentials are correct', async () => {
         const user = await userFactory();
         await supertest(app).post('/sign-up').send(user);
-
         const result = await supertest(app).post('/sign-in').send(user);
 
         expect(result.status).toBe(201);
@@ -85,11 +86,28 @@ describe('Tests POST /sign-in', () => {
 
 describe('Tests POST /upload-test', () => {
 
-    it.todo('Should return an error if Authorization header is missing/incorrect/expired');
+    it('Should return an error if Authorization header is missing/incorrect/expired', async () => {
+        const test = await testFactory();
+        const token = await tokenFactory();
+        const result = await supertest(app).post('/upload-test').set('Authorization', token + 'a').send(test);
 
-    it.todo('Should return an error if the body format is incorrect');
+        expect(result.status).toBe(401);
+    });
 
-    it. todo('Should return a success status code and properly store new test on database if body format and Authorization are correct');
+    it('Should return an error if the body format is incorrect', async () => {
+        const token = await tokenFactory();
+        const result = await supertest(app).post('/upload-test').set('Authorization', token).send({name: "Irrelevant"});
+
+        expect(result.status).toBe(400);
+    });
+
+    it('Should return a success status code and properly store new test on database if body format and Authorization are correct', async () => {
+        const test = await testFactory();
+        const token = await tokenFactory();
+        const result = await supertest(app).post('/upload-test').set('Authorization', token).send(test);
+
+        expect(result.status).toBe(201);
+    });
 });
 
 describe('Tests GET /get-tests', () => {
